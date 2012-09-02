@@ -60,7 +60,7 @@ Dependencies
 
 Build
 -----
-This project uses anvil.js (see http://github.com/arobson/anvil.js) for building/minifying.
+This project uses anvil.js (see http://github.com/appendto/anvil.js) for building/minifying.
 
 Examples
 --------
