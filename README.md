@@ -64,7 +64,7 @@ This project uses anvil.js (see http://github.com/arobson/anvil.js) for building
 
 Examples
 --------
-The examples folder has small samples for normal and AMD usage.
+The examples folder has small samples for normal and AMD usage. Here is the non-AMD sample in jsFiddle: <http://jsfiddle.net/rniemeyer/LvwRt/>.
 
 License
 -------
