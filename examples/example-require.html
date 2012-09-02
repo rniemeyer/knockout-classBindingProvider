@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>knockout-classBindingProvider AMD example</title>
+    <script type="text/javascript" data-main="amd/main.js" src="amd/require.js"></script>
+</head>
+<body>
+<div id="content">
+    Editable: <input type="checkbox" data-class="editable" />
+    <ul data-class="items">
+        <li>
+            <input data-class="edit enabled" />
+            <button data-class="delete enabled">Delete</button>
+        </li>
+    </ul>
+    <button data-class="add enabled">Add Item</button>
+
+    <hr/>
+
+    <!-- ko class: items -->
+    <div data-class="view"></div>
+    <!-- /ko -->
+</div>
+
+<hr/>
+
+<div id="stats">
+    <ul data-class="stats">
+        <li>
+            <span data-class="stat"></span>:
+            <span data-class="count"></span>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>

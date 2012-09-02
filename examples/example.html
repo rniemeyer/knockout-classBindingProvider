@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Knockout-ClassBindingProvider example</title>
+</head>
+<body>
+    <div id="content">
+        Editable: <input type="checkbox" data-class="editable" />
+        <ul data-class="items">
+            <li>
+                <input data-class="edit enabled" />
+                <button data-class="delete enabled">Delete</button>
+            </li>
+        </ul>
+        <button data-class="add enabled">Add Item</button>
+
+        <hr/>
+
+        <!-- ko class: items -->
+        <div data-class="view"></div>
+        <!-- /ko -->
+    </div>
+
+    <hr/>
+
+    <div id="stats">
+        <ul data-class="stats">
+            <li>
+                <span data-class="stat"></span>:
+                <span data-class="count"></span>
+            </li>
+        </ul>
+    </div>
+
+    <script src="../ext/knockout-2.1.0.js"></script>
+    <script src="../build/knockout-classBindingProvider.min.js"></script>
+    <script type="text/javascript">
+        (function(ko) {
+            //create an object that holds our bindings
+            var bindings = {
+                editable: function() {
+                    return { checked: this.editable };
+                },
+                //this is an example of a binding tht is shared across scopes and fields
+                enabled: function(context) {
+                    return { enable: context.$root.editable };
+                },
+                items: function() {
+                    return { foreach: this.items };
+                },
+                edit: function() {
+                    return { value: this.name };
+                },
+                delete: function(context) {
+                    return { click: context.$parent.deleteItem };
+                },
+                add: function() {
+                    return { click: this.addItem };
+                },
+                view: function() {
+                    return { text: this.name };
+                }
+            };
+
+            //just a quick example of adding some logging to the bindings
+            var log = [];
+
+            var instrumentBinding = function(prop, binding, log) {
+                var stats = { count: ko.observable(0), prop: prop };
+                log.push(stats);
+                return function(context) {
+                    setTimeout(function() { stats.count(stats.count() + 1); }, 0);
+                    return binding.call(this, context);
+                };
+            };
+
+            //wrap the bindings in a version that adds some instrumentation
+            for (var prop in bindings) {
+                if (bindings.hasOwnProperty(prop)) {
+                    bindings[prop] = instrumentBinding(prop, bindings[prop], log);
+                }
+            }
+
+            //add some bindings for the stats (that are not instrumented themselves)
+            bindings.stats = function() { return { foreach: this } };
+            bindings.stat = function() { return { text: this.prop } };
+            bindings.count = function() { return { text: this.count } };
+
+            //tell Knockout that we want to use an alternate binding provider
+            ko.bindingProvider.instance = new ko.classBindingProvider(bindings);
+
+            var Item = function(name) {
+                this.name = ko.observable(name);
+            };
+
+            var ViewModel = function(items) {
+                var self = this;
+
+                this.editable = ko.observable(true);
+
+                this.items = ko.observableArray(items);
+
+                this.addItem = function() {
+                    self.items.push(new Item("New"));
+                };
+
+                this.deleteItem = function(item) {
+                    self.items.remove(item);
+                };
+            };
+
+            ko.applyBindings(new ViewModel([
+                new Item("Pen"),
+                new Item("Pencil"),
+                new Item("Eraser")
+            ]), document.getElementById("content"));
+
+            ko.applyBindings(log, document.getElementById("stats"));
+
+        })(ko);
+    </script>
+</body>
+</html>
