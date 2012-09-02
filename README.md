@@ -1,6 +1,6 @@
 knockout-classBindingProvider
 ================
-*knockout-classBindingProvider* is a [Knockout.js](http://knockoutjs.com/) plugin that changes the way that Knockout discovers and parses bindings on elements. With this library, Knockout will, by default, look for a `data-class` attribute and use its value to key into a JavaScript object containing definitions for each binding. This let's you move your bindings specifications out of the markup and into a layer of JavaScript code.
+*knockout-classBindingProvider* is a [Knockout.js](http://knockoutjs.com/) plugin that changes the way that Knockout discovers and parses bindings on elements. With this library, Knockout will look for a `data-class` attribute (by default) and use its value to key into a JavaScript object containing definitions for each binding. This let's you move your bindings specifications out of the markup and into a layer of JavaScript code.
 
 This library uses the `bindingProvider` extensibility point found in Knockout 2.0+. A description of this functionality and the origin of this implementation can be found in this blog [post](http://www.knockmeout.net/2011/09/ko-13-preview-part-2-custom-binding.html).
 
