@@ -52,6 +52,14 @@ Then, you would use these bindings like:
 <input data-class="title input" />
 ```
 
+You can also use it in a virtual binding like:
+
+```html
+<!-- ko class: items -->
+<div data-class="name"></div>
+<!-- /ko -->
+```
+
 Similar to CSS classes, you can list multiple keys and the resulting bindings will be combined for the element.
 
 At run-time, you can also access the bindings, by using `ko.bindingProvider.instance.bindings`.  This allows you to add and remove bindings as your application needs them.
