@@ -9,6 +9,39 @@ describe("knockout-classBindingProvider", function() {
        expect(ko.classBindingProvider).toBeDefined();
     });
 
+    describe("constructing a classBindingProvider", function() {
+        it("should read the bindings object", function() {
+            var bindings = {
+                one: {
+                    text: 'test'
+                }
+            };
+
+            instance = new ko.classBindingProvider(bindings);
+
+            expect(instance.bindings).toEqual(bindings);
+        });
+
+        it("should use a default attribute of 'data-class'", function() {
+            expect(instance.attribute).toEqual("data-class");
+        });
+
+        it("should use a default fallback value of false", function() {
+            expect(instance.fallback).toBeFalsy();
+        });
+
+        it("should respect an override attribute", function() {
+            instance = new ko.classBindingProvider({}, { attribute: "data-test" });
+            expect(instance.attribute).toEqual("data-test");
+        });
+
+        it("should resepect an override fallback value", function() {
+            instance = new ko.classBindingProvider({}, { fallback: true });
+            expect(instance.fallback).toBeTruthy();
+        })
+
+    });
+
     describe("nodeHasBindings", function() {
         it("should identify elements with data-class", function() {
             var div = document.createElement("div");
@@ -38,6 +71,14 @@ describe("knockout-classBindingProvider", function() {
             var div = document.createElement("div");
             div.className = "one";
             instance.attribute = "class";
+
+            expect(instance.nodeHasBindings(div)).toBeTruthy();
+        });
+
+        it("should identify elements with data-bind attributes when fallback is true", function() {
+            var div = document.createElement("div");
+            div.setAttribute("data-bind", "text: one");
+            instance.fallback = true;
 
             expect(instance.nodeHasBindings(div)).toBeTruthy();
         });
@@ -270,50 +311,127 @@ describe("knockout-classBindingProvider", function() {
     });
 
     describe("when Knockout uses this binding provider", function() {
-        beforeEach(function() {
-           ko.bindingProvider.instance = instance;
-        });
+        describe("with default settings", function() {
+            beforeEach(function() {
+                ko.bindingProvider.instance = instance;
+            });
 
-        describe("for elements", function() {
-            it("should execute the appropriate bindings", function() {
-                var div = document.createElement("div");
+            describe("for elements", function() {
+                it("should execute the appropriate bindings", function() {
+                    var div = document.createElement("div");
 
-                div.setAttribute("data-class", "one two");
+                    div.setAttribute("data-class", "one two");
 
-                instance.bindings = {
-                    one: { text: "test" },
-                    two: { visible: true }
-                };
-                
-                ko.applyBindings({}, div);
-                expect(div.innerText || div.textContent).toEqual("test");
-                expect(div.style.display).toBeFalsy();
+                    instance.bindings = {
+                        one: { text: "test" },
+                        two: { visible: true }
+                    };
+
+                    ko.applyBindings({}, div);
+                    expect(div.innerText || div.textContent).toEqual("test");
+                    expect(div.style.display).toBeFalsy();
+                });
+            });
+
+            describe("for comments", function() {
+                it("should execute the appropriate bindings", function() {
+                    var data = { testing: "test" },
+                        parent = document.createElement("div"),
+                        commentStart = document.createComment("ko class: one"),
+                        commentEnd = document.createComment("/ko"),
+                        child = document.createElement("div");
+
+                    parent.appendChild(commentStart);
+                    parent.appendChild(child);
+                    parent.appendChild(commentEnd);
+                    child.setAttribute("data-class", "two");
+
+                    instance.bindings = {
+                        one: { "with": data },
+                        two: function(context) {
+                            return { text: this.testing };
+                        }
+                    };
+
+                    ko.applyBindings({}, parent);
+
+                    expect(parent.childNodes[1].innerText || parent.childNodes[1].textContent).toEqual("test");
+                });
             });
         });
 
-        describe("for comments", function() {
-            it("should execute the appropriate bindings", function() {
-                var data = { testing: "test" },
-                    parent = document.createElement("div"),
-                    commentStart = document.createComment("ko class: one"),
-                    commentEnd = document.createComment("/ko"),
-                    child = document.createElement("div");
+        describe("with fallback true and a custom attribute", function() {
+            beforeEach(function() {
+                ko.bindingProvider.instance = instance = new ko.classBindingProvider({}, {
+                    attribute: "data-klass",
+                    fallback: true
+                });
+            });
 
-                parent.appendChild(commentStart);
-                parent.appendChild(child);
-                parent.appendChild(commentEnd);
-                child.setAttribute("data-class", "two");
+            describe("for elements", function() {
+                it("should execute the appropriate bindings", function() {
+                    var div = document.createElement("div");
 
-                instance.bindings = {
-                    one: { "with": data },
-                    two: function(context) {
-                        return { text: this.testing };
-                    }
-                };
+                    div.setAttribute("data-klass", "one two");
 
-                ko.applyBindings({}, parent);
+                    instance.bindings = {
+                        one: { text: "test" },
+                        two: { visible: true }
+                    };
 
-                expect(parent.childNodes[1].innerText || parent.childNodes[1].textContent).toEqual("test");
+                    ko.applyBindings({}, div);
+
+                    expect(div.innerText || div.textContent).toEqual("test");
+                    expect(div.style.display).toBeFalsy();
+                });
+
+                it("should fallback to respecting data-bind attributes", function() {
+                    var div = document.createElement("div");
+
+                    div.setAttribute("data-bind", "text: 'test', visible: true");
+
+                    ko.applyBindings({}, div);
+
+                    expect(div.innerText || div.textContent).toEqual("test");
+                    expect(div.style.display).toBeFalsy();
+                });
+            });
+
+            describe("for comments", function() {
+                it("should execute the appropriate bindings", function() {
+                    var parent = document.createElement("div"),
+                        commentStart = document.createComment("ko with: data"),
+                        commentEnd = document.createComment("/ko"),
+                        child = document.createElement("div"),
+                        childFallback = document.createElement("div");
+
+                    instance.bindings = {
+                        one: function() {
+                            return {
+                                text: this.testing
+                            };
+                        },
+                        two: { visible: true }
+                    };
+
+                    parent.appendChild(commentStart);
+                    parent.appendChild(child);
+                    parent.appendChild(childFallback);
+                    parent.appendChild(commentEnd);
+
+                    child.setAttribute("data-klass", "one two");
+                    childFallback.setAttribute("data-bind", "text: testing");
+
+                    ko.applyBindings({
+                        data: {
+                            testing: 'test'
+                        }
+                    }, parent);
+
+                    expect(parent.childNodes[1].innerText || parent.childNodes[1].textContent).toEqual("test");
+                    expect(parent.childNodes[1].style.display).toBeFalsy();
+                    expect(parent.childNodes[2].innerText || parent.childNodes[2].textContent).toEqual("test");
+                });
             });
         });
     });

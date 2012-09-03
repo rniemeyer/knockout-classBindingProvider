@@ -8,21 +8,40 @@
     }
 }(function(ko, exports, undefined) {
     //a bindingProvider that uses something different than data-bind attributes
-    var classBindingsProvider = function(bindings, attribute) {
-        var virtualAttribute = "ko class:";
-        this.attribute = attribute || "data-class";
+    //  bindings - an object that contains the binding classes
+    //  options - is an object that can include "attribute" and "fallback" options
+    var classBindingsProvider = function(bindings, options) {
+        var virtualAttribute = "ko class:",
+            existingProvider = new ko.bindingProvider();
+
+        options = options || {};
+
+        //override the attribute
+        this.attribute = options.attribute || "data-class";
+
+        //fallback to the existing binding provider, if bindings are not found
+        this.fallback = options.fallback;
+
+        //this object holds the binding classes
         this.bindings = bindings || {};
 
         //determine if an element has any bindings
         this.nodeHasBindings = function(node) {
-            var value;
+            var result, value;
+
             if (node.nodeType === 1) {
-                return node.getAttribute(this.attribute);
+                result = node.getAttribute(this.attribute);
             }
             else if (node.nodeType === 8) {
                 value = "" + node.nodeValue || node.text;
-                return value.indexOf(virtualAttribute) > -1;
+                result = value.indexOf(virtualAttribute) > -1;
             }
+
+            if (!result && this.fallback) {
+                result = existingProvider.nodeHasBindings(node);
+            }
+
+            return result;
         };
 
         //return the bindings given a node and the bindingContext
@@ -54,6 +73,9 @@
                         ko.utils.extend(result, binding);
                     }
                 }
+            }
+            else if (this.fallback) {
+                result = existingProvider.getBindings(node,bindingContext);
             }
 
             return result;

@@ -21,9 +21,11 @@ To get started, reference the `knockout-classBindingProvider.min.js` script afte
 In your code, prior to calling `ko.applyBindings`, tell Knockout that you want to use a new binding provider.
 
 ```js
-//bindings is a JavaScript object containing binding definitions
-//attribute defaults to "data-class", but can be overriden
-ko.bindingProvider.instance = new ko.classBindingProvider(bindings, attribute);
+//bindings - a JavaScript object containing binding definitions
+//options - an object that can contain these properties:
+//  attribute - override the attribute used for bindings (defaults to `data-class`)
+//  fallback - look for normal `data-bind` bindings after failing with this provider on an element (defaults to `false`)
+ko.bindingProvider.instance = new ko.classBindingProvider(bindings, options);
 ```
 
 Sample bindings object:
