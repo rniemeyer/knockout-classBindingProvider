@@ -23,8 +23,8 @@ In your code, prior to calling `ko.applyBindings`, tell Knockout that you want t
 ```js
 //bindings - a JavaScript object containing binding definitions
 //options - an object that can contain these properties:
-//  attribute - override the attribute used for bindings (defaults to `data-class`)
-//  fallback - look for normal `data-bind` bindings after failing with this provider on an element (defaults to `false`)
+//  attribute - override the attribute used for bindings (defaults to "data-class")
+//  fallback - look for normal `data-bind` bindings after failing with this provider on an element (defaults to false)
 ko.bindingProvider.instance = new ko.classBindingProvider(bindings, options);
 ```
 
