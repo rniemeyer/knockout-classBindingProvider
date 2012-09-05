@@ -64,6 +64,48 @@ Similar to CSS classes, you can list multiple keys and the resulting bindings wi
 
 At run-time, you can also access the bindings, by using `ko.bindingProvider.instance.bindings`.  This allows you to add and remove bindings as your application needs them.
 
+Advanced Usage
+--------------
+You may optionally pass one or more parameters into the binding class by separating them with a colon (`:`). These parameters are passed as additional string arguments into the binding function. Though this makes the markup a little more complex, it offers some flexibility that can reduce the number of binding classes.
+
+For example, to render only the selected section:
+
+```html
+<div data-class="renderSection:overview">...</div>
+<div data-class="renderSection:contact-info">...</div>
+```
+
+```js
+var bindings = {
+	renderSection: function(context, sectionId) {
+		return {
+			'if': this.selectedSectionId() === sectionId
+		}
+	}
+};
+```
+
+Additional parameters are passed as additional arguments to the binding function. At the risk of making binding classes too complex, this opens up some possibilities. This example applies the css class "required-item" if the "phones" array is empty:
+
+```html
+<div data-class="cssIfEmpty:phones:required-item">
+	<h2>Phones</h2>
+	...
+</div>
+```
+
+```js
+var bindings = {
+	cssIfEmpty: function(context, array, css) {
+		var result = {};
+		result[css] = !ko.utils.unwrapObservable(this[array]).length
+		return {
+			css: result
+		};
+	}
+};
+```
+
 Dependencies
 ------------
 * Knockout 2.0+
