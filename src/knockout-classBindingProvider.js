@@ -59,7 +59,7 @@
                 index = value.indexOf(virtualAttribute);
 
                 if (index > -1) {
-                    classes = value.substring(index);
+                    classes = value.substring(index + virtualAttribute.length);
                 }
             }
 
@@ -67,7 +67,9 @@
                 classes = classes.split(' ');
                 //evaluate each class, build a single object to return
                 for (i = 0, j = classes.length; i < j; i++) {
-                    clas = classes[i].split(':');
+                    clas = classes[i];
+                    if (clas.length === 0) continue;
+                    clas = clas.split(':');
                     bindingAccessor = this.bindings[clas[0]];
                     if (bindingAccessor) {
                         binding = typeof bindingAccessor == "function" ? bindingAccessor.apply(bindingContext.$data, [bindingContext].concat(clas.slice(1))) : bindingAccessor;
