@@ -22,6 +22,9 @@
         //fallback to the existing binding provider, if bindings are not found
         this.fallback = options.fallback;
 
+        //throw an error if a binding class is used but not defined
+        this.strict = options.strict;
+
         //this object holds the binding classes
         this.bindings = bindings || {};
 
@@ -73,6 +76,9 @@
                     if (bindingAccessor) {
                         binding = typeof bindingAccessor == "function" ? bindingAccessor.call(bindingContext.$data, bindingContext) : bindingAccessor;
                         ko.utils.extend(result, binding);
+                    }
+                    else if (this.strict) {
+                        throw new Error("Missing binding for class '" + classes[i] + "'");
                     }
                 }
             }
