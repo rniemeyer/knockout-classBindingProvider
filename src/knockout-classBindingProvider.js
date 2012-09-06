@@ -49,18 +49,34 @@
             var i, j, bindingAccessor, binding,
                 result = {},
                 value, index,
-                classes = "", clas;
+                classes = "", clas,
+                virtualDataAttributes,
+                virtualNode;
 
             if (node.nodeType === 1) {
                 classes = node.getAttribute(this.attribute);
+                virtualNode = node;
             }
             else if (node.nodeType === 8) {
                 value = "" + node.nodeValue || node.text;
                 index = value.indexOf(virtualAttribute);
 
                 if (index > -1) {
-                    classes = value.substring(index + virtualAttribute.length);
+                    virtualDataAttributes = value.substring(index + virtualAttribute.length).split(',');
+                    classes = virtualDataAttributes[0];
+                    virtualDataAttributes = virtualDataAttributes.slice(1);
                 }
+
+                virtualNode = {};
+                virtualNode.getAttribute = function(name) {
+                    return ko.utils.arrayFirst(virtualDataAttributes, function(attr) {
+                        var index = attr.indexOf(name + ":");
+                        if (index > -1) {
+                            return attr.substring(index + name.length + 1).replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, '');
+                        }
+                    });
+                };
+
             }
 
             if (classes) {
@@ -71,7 +87,7 @@
                     if (clas.length === 0) continue;
                     bindingAccessor = this.bindings[clas];
                     if (bindingAccessor) {
-                        binding = typeof bindingAccessor == "function" ? bindingAccessor.call(bindingContext.$data, bindingContext) : bindingAccessor;
+                        binding = typeof bindingAccessor == "function" ? bindingAccessor.call(bindingContext.$data, bindingContext, virtualNode) : bindingAccessor;
                         ko.utils.extend(result, binding);
                     }
                 }
