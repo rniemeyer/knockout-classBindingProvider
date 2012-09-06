@@ -78,7 +78,7 @@
                         ko.utils.extend(result, binding);
                     }
                     else if (this.strict) {
-                        throw new Error("Missing binding for class '" + classes[i] + "'");
+                        throw new Error("Missing binding for class '" + clas + "'");
                     }
                 }
             }
