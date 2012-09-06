@@ -69,12 +69,12 @@
 
                 virtualNode = {};
                 virtualNode.getAttribute = function(name) {
-                    return ko.utils.arrayFirst(virtualDataAttributes, function(attr) {
-                        var index = attr.indexOf(name + ":");
-                        if (index > -1) {
-                            return attr.substring(index + name.length + 1).replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, '');
-                        }
+                    var foundAttr;
+                    name = name + ":";
+                    foundAttr = ko.utils.arrayFirst(virtualDataAttributes, function(attr) {
+                        return attr.indexOf(name) > -1;
                     });
+                    return foundAttr && foundAttr.split(':')[1].replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, '');
                 };
 
             }
