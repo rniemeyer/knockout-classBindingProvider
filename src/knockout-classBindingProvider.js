@@ -59,12 +59,12 @@
                 index = value.indexOf(virtualAttribute);
 
                 if (index > -1) {
-                    classes = value.substring(index + virtualAttribute.length).replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, '').replace(/(\s|\u00A0){2,}/g, ' ');
+                    classes = value.substring(index + virtualAttribute.length);
                 }
             }
 
             if (classes) {
-                classes = classes.split(' ');
+                classes = classes.replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, "").replace(/(\s|\u00A0){2,}/g, " ").split(' ');
                 //evaluate each class, build a single object to return
                 for (i = 0, j = classes.length; i < j; i++) {
                     bindingAccessor = this.bindings[classes[i]];
