@@ -49,7 +49,7 @@
             var i, j, bindingAccessor, binding,
                 result = {},
                 value, index,
-                classes = "", clas;
+                classes = "";
 
             if (node.nodeType === 1) {
                 classes = node.getAttribute(this.attribute);
@@ -59,7 +59,7 @@
                 index = value.indexOf(virtualAttribute);
 
                 if (index > -1) {
-                    classes = value.substring(index + virtualAttribute.length);
+                    classes = value.substring(index + virtualAttribute.length).replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, '').replace(/(\s|\u00A0){2,}/g, ' ');
                 }
             }
 
@@ -67,9 +67,7 @@
                 classes = classes.split(' ');
                 //evaluate each class, build a single object to return
                 for (i = 0, j = classes.length; i < j; i++) {
-                    clas = classes[i];
-                    if (clas.length === 0) continue;
-                    bindingAccessor = this.bindings[clas];
+                    bindingAccessor = this.bindings[classes[i]];
                     if (bindingAccessor) {
                         binding = typeof bindingAccessor == "function" ? bindingAccessor.call(bindingContext.$data, bindingContext) : bindingAccessor;
                         ko.utils.extend(result, binding);
