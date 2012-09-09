@@ -69,7 +69,7 @@
                 for (i = 0, j = classes.length; i < j; i++) {
                     bindingAccessor = this.bindings[classes[i]];
                     if (bindingAccessor) {
-                        binding = typeof bindingAccessor == "function" ? bindingAccessor.call(bindingContext.$data, bindingContext) : bindingAccessor;
+                        binding = typeof bindingAccessor == "function" ? bindingAccessor.call(bindingContext.$data, bindingContext, classes) : bindingAccessor;
                         ko.utils.extend(result, binding);
                     }
                 }
