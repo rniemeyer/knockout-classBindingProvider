@@ -32,7 +32,7 @@ Sample bindings object:
 
 ```js
 var bindings = {
-    title: function(context) {
+    title: function(context, classes) {
         return {
             value: this.title,
             enable: context.$parent.editable
@@ -44,7 +44,7 @@ var bindings = {
 };
 ```
 
-In the example, the `title` binding class uses a function that is given the binding context as its only argument. The value of `this` is also set to the current data (`context.$data`) to make it easy to access its properties. The function needs to return the bindings that should be used for the element. Alternatively, you can specify a static value like in the `input` binding class where the resulting bindings can be determined now without the need for the current context.
+In the example, the `title` binding class uses a function that is given the binding context and an array containing all of the binding classes listed on the element. The value of `this` is also set to the current data (`context.$data`) to make it easy to access its properties. The function needs to return the bindings that should be used for the element. Alternatively, you can specify a static value like in the `input` binding class where the resulting bindings can be determined at design time, without the need for the current context.
 
 Then, you would use these bindings like:
 
@@ -60,7 +60,7 @@ You can also use it in a virtual binding like:
 <!-- /ko -->
 ```
 
-Similar to CSS classes, you can list multiple keys and the resulting bindings will be combined for the element.
+Similar to CSS classes, you can list multiple keys and the resulting bindings will be combined for the element. Also, when using a function for a binding class, the second argument passed to the function will be an array containing all of the binding classes listed on the element. These classes can even be treated as modifiers or dynamic values when generating the bindings, as each binding class does not have to actually exist in the bindings object.
 
 At run-time, you can also access the bindings, by using `ko.bindingProvider.instance.bindings`.  This allows you to add and remove bindings as your application needs them.
 

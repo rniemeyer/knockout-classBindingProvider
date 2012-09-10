@@ -35,11 +35,10 @@ describe("knockout-classBindingProvider", function() {
             expect(instance.attribute).toEqual("data-test");
         });
 
-        it("should resepect an override fallback value", function() {
+        it("should respect an override fallback value", function() {
             instance = new ko.classBindingProvider({}, { fallback: true });
             expect(instance.fallback).toBeTruthy();
         })
-
     });
 
     describe("nodeHasBindings", function() {
@@ -114,14 +113,16 @@ describe("knockout-classBindingProvider", function() {
                     expect(valueOfThis).toEqual(data);
                 });
 
-                it("should pass the context as the only argument when executing the binding", function() {
+                it("should pass appropriate arguments when executing the binding", function() {
                     var bindingSpy = jasmine.createSpy('binding'), context = { $data: {} };
 
                     instance.bindings.one = bindingSpy;
 
                     instance.getBindings(div, context);
 
-                    expect(bindingSpy).toHaveBeenCalledWith(context);
+                    expect(bindingSpy).toHaveBeenCalled();
+                    expect(bindingSpy.mostRecentCall.args[0]).toEqual(context);
+                    expect(bindingSpy.mostRecentCall.args[1][0]).toEqual("one");
                 });
 
                 it("should ignore a class that does not exist in the bindings for an element", function() {
@@ -157,14 +158,16 @@ describe("knockout-classBindingProvider", function() {
                     expect(valueOfThis).toEqual(data);
                 });
 
-                it("should pass the context as the only argument when executing the binding", function() {
+                it("should pass appropriate arguments when executing the binding", function() {
                     var bindingSpy = jasmine.createSpy('binding'), context = { $data: {} };
 
                     instance.bindings.one = bindingSpy;
 
                     instance.getBindings(comment, context);
 
-                    expect(bindingSpy).toHaveBeenCalledWith(context);
+                    expect(bindingSpy).toHaveBeenCalled();
+                    expect(bindingSpy.mostRecentCall.args[0]).toEqual(context);
+                    expect(bindingSpy.mostRecentCall.args[1][0]).toEqual("one");
                 });
 
                 it("should ignore a class that does not exist in the bindings for a comment", function() {
@@ -212,7 +215,7 @@ describe("knockout-classBindingProvider", function() {
                     expect(valueOfThisTwo).toEqual(data);
                 });
 
-                it("should pass the context as the only argument when executing the binding", function() {
+                it("should pass appropriate arguments when executing the binding", function() {
                     var bindingSpyOne = jasmine.createSpy('bindingOne'),
                         bindingSpyTwo = jasmine.createSpy('bindingTwo'),
                         context = { $data: {} };
@@ -224,8 +227,40 @@ describe("knockout-classBindingProvider", function() {
 
                     instance.getBindings(div, context);
 
-                    expect(bindingSpyOne).toHaveBeenCalledWith(context);
-                    expect(bindingSpyTwo).toHaveBeenCalledWith(context);
+                    expect(bindingSpyOne).toHaveBeenCalled();
+                    expect(bindingSpyOne.mostRecentCall.args[0]).toEqual(context);
+                    expect(bindingSpyOne.mostRecentCall.args[1][0]).toEqual("one");
+                    expect(bindingSpyOne.mostRecentCall.args[1][1]).toEqual("two");
+
+                    expect(bindingSpyTwo).toHaveBeenCalled();
+                    expect(bindingSpyTwo.mostRecentCall.args[0]).toEqual(context);
+                    expect(bindingSpyTwo.mostRecentCall.args[1][0]).toEqual("one");
+                    expect(bindingSpyTwo.mostRecentCall.args[1][1]).toEqual("two");
+                });
+
+                it("should ignore extra whitespace", function() {
+                    var bindingSpyOne = jasmine.createSpy('bindingOne'),
+                        bindingSpyTwo = jasmine.createSpy('bindingTwo'),
+                        context = { $data: {} };
+
+                    div.setAttribute("data-class", "           one         two               ");
+
+                    instance.bindings.one = bindingSpyOne;
+                    instance.bindings.two = bindingSpyTwo;
+
+                    instance.getBindings(div, context);
+
+                    expect(bindingSpyOne).toHaveBeenCalled();
+                    expect(bindingSpyOne.mostRecentCall.args[0]).toEqual(context);
+                    expect(bindingSpyOne.mostRecentCall.args[1][0]).toEqual("one");
+                    expect(bindingSpyOne.mostRecentCall.args[1][1]).toEqual("two");
+                    expect(bindingSpyOne.mostRecentCall.args[1].length).toEqual(2);
+
+                    expect(bindingSpyTwo).toHaveBeenCalled();
+                    expect(bindingSpyTwo.mostRecentCall.args[0]).toEqual(context);
+                    expect(bindingSpyTwo.mostRecentCall.args[1][0]).toEqual("one");
+                    expect(bindingSpyTwo.mostRecentCall.args[1][1]).toEqual("two");
+                    expect(bindingSpyTwo.mostRecentCall.args[1].length).toEqual(2);
                 });
 
                 it("should ignore a single class that does not exist from the list of classes for an element", function() {
@@ -274,7 +309,7 @@ describe("knockout-classBindingProvider", function() {
                     expect(valueOfThisTwo).toEqual(data);
                 });
 
-                it("should pass the context as the only argument when executing the binding", function() {
+                it("should pass appropriate arguments when executing the binding", function() {
                     var bindingSpyOne = jasmine.createSpy('bindingOne'),
                         bindingSpyTwo = jasmine.createSpy('bindingTwo'),
                         context = { $data: {} },
@@ -285,8 +320,39 @@ describe("knockout-classBindingProvider", function() {
 
                     instance.getBindings(comment, context);
 
-                    expect(bindingSpyOne).toHaveBeenCalledWith(context);
-                    expect(bindingSpyTwo).toHaveBeenCalledWith(context);
+                    expect(bindingSpyOne).toHaveBeenCalled();
+                    expect(bindingSpyOne.mostRecentCall.args[0]).toEqual(context);
+                    expect(bindingSpyOne.mostRecentCall.args[1][0]).toEqual("one");
+                    expect(bindingSpyOne.mostRecentCall.args[1][1]).toEqual("two");
+
+                    expect(bindingSpyTwo).toHaveBeenCalled();
+                    expect(bindingSpyTwo.mostRecentCall.args[0]).toEqual(context);
+                    expect(bindingSpyTwo.mostRecentCall.args[1][0]).toEqual("one");
+                    expect(bindingSpyTwo.mostRecentCall.args[1][1]).toEqual("two");
+                });
+
+                it("should ignore extra whitespace", function() {
+                    var bindingSpyOne = jasmine.createSpy('bindingOne'),
+                        bindingSpyTwo = jasmine.createSpy('bindingTwo'),
+                        context = { $data: {} },
+                        comment = document.createComment("ko class:             one            two              ");
+
+                    instance.bindings.one = bindingSpyOne;
+                    instance.bindings.two = bindingSpyTwo;
+
+                    instance.getBindings(comment, context);
+
+                    expect(bindingSpyOne).toHaveBeenCalled();
+                    expect(bindingSpyOne.mostRecentCall.args[0]).toEqual(context);
+                    expect(bindingSpyOne.mostRecentCall.args[1][0]).toEqual("one");
+                    expect(bindingSpyOne.mostRecentCall.args[1][1]).toEqual("two");
+                    expect(bindingSpyOne.mostRecentCall.args[1].length).toEqual(2);
+
+                    expect(bindingSpyTwo).toHaveBeenCalled();
+                    expect(bindingSpyTwo.mostRecentCall.args[0]).toEqual(context);
+                    expect(bindingSpyTwo.mostRecentCall.args[1][0]).toEqual("one");
+                    expect(bindingSpyTwo.mostRecentCall.args[1][1]).toEqual("two");
+                    expect(bindingSpyTwo.mostRecentCall.args[1].length).toEqual(2);
                 });
 
                 it("should ignore a single class that does not exist from the list of classes for an element", function() {
