@@ -9,7 +9,7 @@
 }(function(ko, exports, undefined) {
     //a bindingProvider that uses something different than data-bind attributes
     //  bindings - an object that contains the binding classes
-    //  options - is an object that can include "attribute" and "fallback" options
+    //  options - is an object that can include "attribute", "fallback", and "strict" options
     var classBindingsProvider = function(bindings, options) {
         var virtualAttribute = "ko class:",
             existingProvider = new ko.bindingProvider();
@@ -21,6 +21,9 @@
 
         //fallback to the existing binding provider, if bindings are not found
         this.fallback = options.fallback;
+
+        //throw an error if a binding class is used but not defined
+        this.strict = options.strict;
 
         //this object holds the binding classes
         this.bindings = bindings || {};
@@ -49,7 +52,7 @@
             var i, j, bindingAccessor, binding,
                 result = {},
                 value, index,
-                classes = "";
+                classes = "", clas;
 
             if (node.nodeType === 1) {
                 classes = node.getAttribute(this.attribute);
@@ -67,10 +70,15 @@
                 classes = classes.replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, "").replace(/(\s|\u00A0){2,}/g, " ").split(' ');
                 //evaluate each class, build a single object to return
                 for (i = 0, j = classes.length; i < j; i++) {
-                    bindingAccessor = this.bindings[classes[i]];
+                    clas = classes[i];
+                    if (clas.length === 0) continue;
+                    bindingAccessor = this.bindings[clas];
                     if (bindingAccessor) {
                         binding = typeof bindingAccessor == "function" ? bindingAccessor.call(bindingContext.$data, bindingContext, classes) : bindingAccessor;
                         ko.utils.extend(result, binding);
+                    }
+                    else if (this.strict) {
+                        throw new Error("Missing binding for class '" + clas + "'");
                     }
                 }
             }
