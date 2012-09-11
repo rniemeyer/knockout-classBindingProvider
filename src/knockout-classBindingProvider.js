@@ -13,7 +13,7 @@
     var classBindingsProvider = function(bindings, options) {
         var virtualAttribute = "ko class:",
             existingProvider = new ko.bindingProvider(),
-            bindingRouter = typeof bindings == "function" ? bindings : function(className) { return this.bindings[className]; };
+            bindingRouter;
 
         options = options || {};
 
@@ -24,7 +24,10 @@
         this.fallback = options.fallback;
 
         //object that holds the binding classes, or a routing function that returns a binding class
-        this.bindings = bindings || {};
+        this.bindings = bindings || (bindings = {});
+
+        //function that returns a binding class, given the class name
+        bindingRouter = typeof bindings == "function" ? bindings : function(className) { return bindings[className]; };
 
         //determine if an element has any bindings
         this.nodeHasBindings = function(node) {
@@ -68,7 +71,7 @@
                 classes = classes.replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, "").replace(/(\s|\u00A0){2,}/g, " ").split(' ');
                 //evaluate each class, build a single object to return
                 for (i = 0, j = classes.length; i < j; i++) {
-                    bindingAccessor = bindingRouter(classes[i]);
+                    bindingAccessor = bindingRouter(classes[i], classes);
                     if (bindingAccessor) {
                         binding = typeof bindingAccessor == "function" ? bindingAccessor.call(bindingContext.$data, bindingContext, classes) : bindingAccessor;
                         ko.utils.extend(result, binding);
