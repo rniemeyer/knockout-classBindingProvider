@@ -27,6 +27,11 @@
         //this object holds the binding classes
         this.bindings = bindings || {};
 
+        //allow bindings to be added after the instantiation
+        this.registerBindings = function(newBindings) {
+            ko.utils.extend(this.bindings, newBindings);
+        };
+
         //determine if an element has any bindings
         this.nodeHasBindings = function(node) {
             var result, value;
