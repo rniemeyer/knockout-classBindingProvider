@@ -9,15 +9,17 @@
 }(function(ko, exports, undefined) {
     //a bindingProvider that uses something different than data-bind attributes
     //  bindings - an object that contains the binding classes
-    //  options - is an object that can include "attribute" and "fallback" options
+    //  options - is an object that can include "attribute", "virtualAttribute", and "fallback" options
     var classBindingsProvider = function(bindings, options) {
-        var virtualAttribute = "ko class:",
-            existingProvider = new ko.bindingProvider();
+        var existingProvider = new ko.bindingProvider();
 
         options = options || {};
 
         //override the attribute
         this.attribute = options.attribute || "data-class";
+
+        //override the virtualAttribute
+        this.virtualAttribute = options.virtualAttribute || "ko class:";
 
         //fallback to the existing binding provider, if bindings are not found
         this.fallback = options.fallback;
@@ -34,7 +36,7 @@
             }
             else if (node.nodeType === 8) {
                 value = "" + node.nodeValue || node.text;
-                result = value.indexOf(virtualAttribute) > -1;
+                result = value.indexOf(this.virtualAttribute) > -1;
             }
 
             if (!result && this.fallback) {
@@ -56,10 +58,10 @@
             }
             else if (node.nodeType === 8) {
                 value = "" + node.nodeValue || node.text;
-                index = value.indexOf(virtualAttribute);
+                index = value.indexOf(this.virtualAttribute);
 
                 if (index > -1) {
-                    classes = value.substring(index + virtualAttribute.length);
+                    classes = value.substring(index + this.virtualAttribute.length);
                 }
             }
 
