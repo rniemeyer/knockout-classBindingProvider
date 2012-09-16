@@ -63,7 +63,7 @@ You can also use it in a virtual binding like:
 
 Similar to CSS classes, you can list multiple keys and the resulting bindings will be combined for the element. Also, when using a function for a binding class, the second argument passed to the function will be an array containing all of the binding classes listed on the element. These classes can even be treated as modifiers or dynamic values when generating the bindings, as each binding class does not have to actually exist in the bindings object.
 
-At run-time, you can also access the bindings, by using `ko.bindingProvider.instance.bindings`.  This allows you to add and remove bindings as your application needs them.
+At run-time, you can also access the bindings, by using `ko.bindingProvider.instance.bindings`.  This allows you to add and remove bindings as your application needs them. You can also merge a new set of bindings into the existing bindings using `ko.bindingProvider.instance.registerBindings(newBindings);`.
 
 Dependencies
 ------------

@@ -1,4 +1,4 @@
-//knockout-classBindingProvider v0.3.1 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
+//knockout-classBindingProvider v0.3.2 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
 !(function(factory) {
     //AMD
     if (typeof define === "function" && define.amd) {
@@ -27,6 +27,11 @@
 
         //this object holds the binding classes
         this.bindings = bindings || {};
+        
+        //allow bindings to be registered after instantiation
+        this.registerBindings = function(newBindings) {
+	        ko.utils.extend(this.bindings, newBindings);
+        };
 
         //determine if an element has any bindings
         this.nodeHasBindings = function(node) {

@@ -414,6 +414,46 @@ describe("knockout-classBindingProvider", function() {
         });
     });
 
+    describe("registerBindings", function() {
+        beforeEach(function() {
+            instance.bindings = {
+                one: { text: "test" },
+                two: { visible: true }
+            };
+        });
+
+        it("should add bindings to the existing bindings", function() {
+            instance.registerBindings({
+                three: {
+                    enabled: false
+                },
+                four: {
+                    css: {
+                        active: true
+                    }
+                }
+            });
+
+            expect(ko.toJSON(instance.bindings.one)).toEqual(ko.toJSON({
+                text: "test"
+            }));
+
+            expect(ko.toJSON(instance.bindings.two)).toEqual(ko.toJSON({
+                visible: true
+            }));
+
+            expect(ko.toJSON(instance.bindings.three)).toEqual(ko.toJSON({
+                enabled: false
+            }));
+
+            expect(ko.toJSON(instance.bindings.four)).toEqual(ko.toJSON({
+                css: {
+                    active: true
+                }
+            }));
+        });
+    });
+
     describe("when Knockout uses this binding provider", function() {
         describe("with default settings", function() {
             beforeEach(function() {
