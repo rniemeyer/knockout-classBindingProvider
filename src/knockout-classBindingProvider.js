@@ -9,7 +9,7 @@
 }(function(ko, exports, undefined) {
     //a bindingProvider that uses something different than data-bind attributes
     //  bindings - an object that contains the binding classes
-    //  options - is an object that can include "attribute", virtualAttribute, and "fallback" options
+    //  options - is an object that can include "attribute", "virtualAttribute", and "fallback" options
     var classBindingsProvider = function(bindings, options) {
         var existingProvider = new ko.bindingProvider();
 
