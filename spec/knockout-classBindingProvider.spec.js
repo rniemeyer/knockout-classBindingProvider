@@ -35,6 +35,11 @@ describe("knockout-classBindingProvider", function() {
             expect(instance.attribute).toEqual("data-test");
         });
 
+        it("should respect an override virtual attribute", function() {
+            instance = new ko.classBindingProvider({}, { virtualAttribute: "test" });
+            expect(instance.virtualAttribute).toEqual("ko test:");
+        });
+
         it("should respect an override fallback value", function() {
             instance = new ko.classBindingProvider({}, { fallback: true });
             expect(instance.fallback).toBeTruthy();
@@ -72,6 +77,13 @@ describe("knockout-classBindingProvider", function() {
             instance.attribute = "class";
 
             expect(instance.nodeHasBindings(div)).toBeTruthy();
+        });
+
+        it("should identify comments with a custom virtual attribute name", function() {
+            var comment = document.createComment("ko test: one");
+            instance.virtualAttribute = "ko test:";
+
+            expect(instance.nodeHasBindings(comment)).toBeTruthy();
         });
 
         it("should identify elements with data-bind attributes when fallback is true", function() {
@@ -128,6 +140,20 @@ describe("knockout-classBindingProvider", function() {
                 it("should ignore a class that does not exist in the bindings for an element", function() {
                     expect(ko.toJSON(instance.getBindings(div))).toEqual("{}");
                 });
+
+                it("should return the appropriate bindings when using a custom attribute", function() {
+                    instance.bindings.one = {
+                        text: "test",
+                        visible: true
+                    };
+
+                    instance.attribute = "data-test";
+
+                    div = document.createElement("div");
+                    div.setAttribute("data-test", "one");
+
+                    expect(instance.getBindings(div)).toEqual(instance.bindings.one);
+                });
             });
 
             describe("for comments", function() {
@@ -172,6 +198,18 @@ describe("knockout-classBindingProvider", function() {
 
                 it("should ignore a class that does not exist in the bindings for a comment", function() {
                     expect(ko.toJSON(instance.getBindings(comment))).toEqual("{}");
+                });
+
+                it("should return the appropriate bindings when using a custom virtual attribute", function() {
+                    instance.bindings.one = {
+                        text: "test",
+                        visible: true
+                    };
+
+                    instance.virtualAttribute = "ko test:";
+                    comment = document.createComment("ko test: one");
+
+                    expect(instance.getBindings(comment)).toEqual(instance.bindings.one);
                 });
             });
         });
@@ -376,6 +414,46 @@ describe("knockout-classBindingProvider", function() {
         });
     });
 
+    describe("registerBindings", function() {
+        beforeEach(function() {
+            instance.bindings = {
+                one: { text: "test" },
+                two: { visible: true }
+            };
+        });
+
+        it("should add bindings to the existing bindings", function() {
+            instance.registerBindings({
+                three: {
+                    enabled: false
+                },
+                four: {
+                    css: {
+                        active: true
+                    }
+                }
+            });
+
+            expect(ko.toJSON(instance.bindings.one)).toEqual(ko.toJSON({
+                text: "test"
+            }));
+
+            expect(ko.toJSON(instance.bindings.two)).toEqual(ko.toJSON({
+                visible: true
+            }));
+
+            expect(ko.toJSON(instance.bindings.three)).toEqual(ko.toJSON({
+                enabled: false
+            }));
+
+            expect(ko.toJSON(instance.bindings.four)).toEqual(ko.toJSON({
+                css: {
+                    active: true
+                }
+            }));
+        });
+    });
+
     describe("when Knockout uses this binding provider", function() {
         describe("with default settings", function() {
             beforeEach(function() {
@@ -426,10 +504,11 @@ describe("knockout-classBindingProvider", function() {
             });
         });
 
-        describe("with fallback true and a custom attribute", function() {
+        describe("with fallback true, a custom attribute, and a custom virtual attribute", function() {
             beforeEach(function() {
                 ko.bindingProvider.instance = instance = new ko.classBindingProvider({}, {
                     attribute: "data-klass",
+                    virtualAttribute: "klass",
                     fallback: true
                 });
             });
@@ -465,6 +544,45 @@ describe("knockout-classBindingProvider", function() {
 
             describe("for comments", function() {
                 it("should execute the appropriate bindings", function() {
+                    var parent = document.createElement("div"),
+                        commentStart = document.createComment("ko klass: data"),
+                        commentEnd = document.createComment("/ko"),
+                        child = document.createElement("div"),
+                        childFallback = document.createElement("div");
+
+                    instance.bindings = {
+                        data: function() {
+                            return { "with": this.data };
+                        },
+                        one: function() {
+                            return {
+                                text: this.testing
+                            };
+                        },
+                        two: { visible: true }
+                    };
+
+                    parent.appendChild(commentStart);
+                    parent.appendChild(child);
+                    parent.appendChild(childFallback);
+                    parent.appendChild(commentEnd);
+
+                    child.setAttribute("data-klass", "one two");
+                    childFallback.setAttribute("data-bind", "text: testing");
+
+                    ko.applyBindings({
+                        data: {
+                            testing: 'test'
+                        }
+                    }, parent);
+
+                    expect(parent.childNodes[1].innerText || parent.childNodes[1].textContent).toEqual("test");
+                    expect(parent.childNodes[1].style.display).toBeFalsy();
+                    expect(parent.childNodes[2].innerText || parent.childNodes[2].textContent).toEqual("test");
+
+                });
+
+                it("should fallback to the appropriate bindings", function() {
                     var parent = document.createElement("div"),
                         commentStart = document.createComment("ko with: data"),
                         commentEnd = document.createComment("/ko"),
