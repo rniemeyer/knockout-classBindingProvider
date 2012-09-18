@@ -30,11 +30,12 @@
         //this object holds a list of binding keys
         this.registeredBindingKeys = [];
         
+        // check if bindings are already registered
         this.bindingIsRegistered = function(bindingKey) {
 	        return this.registeredBindingKeys.indexOf(bindingKey) > -1;
         };
         
-        //allow bindings to be registered after instantiation
+        //allow bindings to be registered after instantiation, you can optionally pass a bindingKey for later reference
         this.registerBindings = function(newBindings, bindingKey) {
 	        if(bindingKey) {
 	        	if(this.bindingIsRegistered(bindingKey)) {
