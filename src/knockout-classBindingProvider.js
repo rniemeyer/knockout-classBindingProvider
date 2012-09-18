@@ -27,9 +27,26 @@
         //this object holds the binding classes
         this.bindings = bindings || {};
         
+        //this object holds a list of binding keys
+        this.registeredBindingKeys = [];
+        
+        this.bindingIsRegistered = function(bindingKey) {
+	        return this.registeredBindingKeys.indexOf(bindingKey) > -1;
+        };
+        
         //allow bindings to be registered after instantiation
-        this.registerBindings = function(newBindings) {
+        this.registerBindings = function(newBindings, bindingKey) {
+	        if(bindingKey) {
+	        	if(this.bindingIsRegistered(bindingKey)) {
+		        	return false; // bindings already registered
+	        	}
+	        
+	        	this.registeredBindingKeys.push(bindingKey);
+	        }
+	        
 	        ko.utils.extend(this.bindings, newBindings);
+	        
+	        return true;
         };
 
         //determine if an element has any bindings
