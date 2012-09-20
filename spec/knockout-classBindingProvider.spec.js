@@ -454,6 +454,24 @@ describe("knockout-classBindingProvider", function() {
         });
     });
 
+    describe("bindingRouter", function() {
+        beforeEach(function() {
+            instance.bindings = {
+                one: {
+                    two: {
+                        three: {
+                            text: "Test"
+                        }
+                    }
+                }
+            };
+        });
+
+        it("should follow binding path and find binding", function() {
+            expect(instance.bindingRouter("one.two.three", instance.bindings).text).toEqual("Test");
+        });
+    });
+
     describe("when Knockout uses this binding provider", function() {
         describe("with default settings", function() {
             beforeEach(function() {

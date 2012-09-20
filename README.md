@@ -24,7 +24,8 @@ In your code, prior to calling `ko.applyBindings`, tell Knockout that you want t
 //bindings - a JavaScript object containing binding definitions
 //options - an object that can contain these properties:
 //  attribute - override the attribute used for bindings (defaults to `data-class`)
-// virtual attribute - override the text used for virtual bindings (defaults to `class` and specified as `ko class:`)
+//  virtualAttribute - override the text used for virtual bindings (defaults to `class` and specified as `ko class:`)
+//  bindingRouter - custom function for routing data-class bindings to the appropriate binding
 //  fallback - look for normal `data-bind` bindings after failing with this provider on an element (defaults to false)
 ko.bindingProvider.instance = new ko.classBindingProvider(bindings, options);
 ```
@@ -41,7 +42,14 @@ var bindings = {
     },
     input: {
         valueUpdate: 'afterkeydown'
-    }
+    },
+	list: {
+		items: function(context, classes) { 
+			return {
+				foreach: this.items
+			}
+		}
+	}
 };
 ```
 
@@ -61,9 +69,19 @@ You can also use it in a virtual binding like:
 <!-- /ko -->
 ```
 
-Similar to CSS classes, you can list multiple keys and the resulting bindings will be combined for the element. Also, when using a function for a binding class, the second argument passed to the function will be an array containing all of the binding classes listed on the element. These classes can even be treated as modifiers or dynamic values when generating the bindings, as each binding class does not have to actually exist in the bindings object.
+Similar to CSS classes, you can list multiple keys and the resulting bindings will be combined for the element. By default, a binding class can follow an object tree by writing the property path separated by periods.  Using the bindings object above, you can do:
+
+```html
+<ul data-class="list.items">
+	<li> ... </li>
+</ul>
+```
+
+Also, when using a function for a binding class, the second argument passed to the function will be an array containing all of the binding classes listed on the element. These classes can even be treated as modifiers or dynamic values when generating the bindings, as each binding class does not have to actually exist in the bindings object.
 
 At run-time, you can also access the bindings, by using `ko.bindingProvider.instance.bindings`.  This allows you to add and remove bindings as your application needs them. You can also merge a new set of bindings into the existing bindings using `ko.bindingProvider.instance.registerBindings(newBindings);`.
+
+To use your own binding router, set `options.bindingRouter = function(class, bindings){...}`.  `class` is the current class being requested and `bindings` is the bindings object to search for the class in.  Be sure to return a valid binding object.  
 
 Dependencies
 ------------
