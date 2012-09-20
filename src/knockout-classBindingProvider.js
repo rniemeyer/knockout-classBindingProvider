@@ -9,7 +9,7 @@
 }(function(ko, exports, undefined) {
     //a bindingProvider that uses something different than data-bind attributes
     //  bindings - an object that contains the binding classes
-    //  options - is an object that can include "attribute", "virtualAttribute", and "fallback" options
+    //  options - is an object that can include "attribute", "virtualAttribute", bindingRouter, and "fallback" options
     var classBindingsProvider = function(bindings, options) {
         var existingProvider = new ko.bindingProvider();
 
@@ -26,6 +26,18 @@
 
         //this object holds the binding classes
         this.bindings = bindings || {};
+
+        //returns a binding class, given the class name and the bindings object
+        this.bindingRouter = options.bindingRouter ? options.bindingRouter : function(className, bindings) {
+            var classPath = className.split(".");
+            var bindingObject = bindings;
+
+            for (var i = 0; i < classPath.length; i++) {
+                bindingObject = bindingObject[classPath[i]];
+            };
+
+            return bindingObject;
+        };
         
         //allow bindings to be registered after instantiation
         this.registerBindings = function(newBindings) {
@@ -74,7 +86,7 @@
                 classes = classes.replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, "").replace(/(\s|\u00A0){2,}/g, " ").split(' ');
                 //evaluate each class, build a single object to return
                 for (i = 0, j = classes.length; i < j; i++) {
-                    bindingAccessor = this.bindings[classes[i]];
+                    bindingAccessor = this.bindingRouter(classes[i], this.bindings);
                     if (bindingAccessor) {
                         binding = typeof bindingAccessor == "function" ? bindingAccessor.call(bindingContext.$data, bindingContext, classes) : bindingAccessor;
                         ko.utils.extend(result, binding);
