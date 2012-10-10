@@ -454,21 +454,28 @@ describe("knockout-classBindingProvider", function() {
         });
     });
 
-    describe("bindingRouter", function() {
+    describe("default bindingRouter", function() {
         beforeEach(function() {
             instance.bindings = {
                 one: {
                     two: {
                         three: {
-                            text: "Test"
+                            text: "match on sub properties"
                         }
                     }
+                },
+                "one.two.three.four": {
+                    text: "match directly"
                 }
             };
         });
 
-        it("should follow binding path and find binding", function() {
-            expect(instance.bindingRouter("one.two.three", instance.bindings).text).toEqual("Test");
+        it("should follow binding path and find the binding", function() {
+            expect(instance.bindingRouter("one.two.three", instance.bindings).text).toEqual("match on sub properties");
+        });
+
+        it("should match a property directly, even if it contains periods", function() {
+            expect(instance.bindingRouter("one.two.three.four", instance.bindings).text).toEqual("match directly");
         });
     });
 
@@ -482,16 +489,24 @@ describe("knockout-classBindingProvider", function() {
                 it("should execute the appropriate bindings", function() {
                     var div = document.createElement("div");
 
-                    div.setAttribute("data-class", "one two");
+                    div.setAttribute("data-class", "one two three.sub");
 
                     instance.bindings = {
                         one: { text: "test" },
-                        two: { visible: true }
+                        two: { visible: true },
+                        three: {
+                            sub: {
+                                attr: {
+                                    title: "title_test"
+                                }
+                            }
+                        }
                     };
 
                     ko.applyBindings({}, div);
                     expect(div.innerText || div.textContent).toEqual("test");
                     expect(div.style.display).toBeFalsy();
+                    expect(div.getAttribute("title")).toEqual("title_test");
                 });
             });
 
@@ -634,6 +649,43 @@ describe("knockout-classBindingProvider", function() {
                     expect(parent.childNodes[1].style.display).toBeFalsy();
                     expect(parent.childNodes[2].innerText || parent.childNodes[2].textContent).toEqual("test");
                 });
+            });
+        });
+
+        describe("with a custom binding router", function() {
+            var router, bindings;
+            beforeEach(function() {
+                router = function(className, bindings) {
+                    return { text: className };
+                };
+
+                bindings = {};
+
+                ko.bindingProvider.instance = instance = new ko.classBindingProvider(bindings, {
+                    bindingRouter: router
+                });
+            });
+
+            it("should call a custom binding router with the correct arguments", function() {
+                var div = document.createElement("div");
+
+                spyOn(instance, "bindingRouter");
+
+                div.setAttribute("data-class", "one");
+
+                ko.applyBindings({}, div);
+
+                expect(instance.bindingRouter).toHaveBeenCalledWith("one", bindings);
+            });
+
+            it("should use the return value of the custom binding router as the binding", function() {
+                var div = document.createElement("div");
+
+                div.setAttribute("data-class", "one");
+
+                ko.applyBindings({}, div);
+
+                expect(div.innerText || div.textContent).toEqual("one");
             });
         });
     });

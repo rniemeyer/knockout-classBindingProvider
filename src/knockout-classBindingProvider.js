@@ -28,11 +28,19 @@
         this.bindings = bindings || {};
 
         //returns a binding class, given the class name and the bindings object
-        this.bindingRouter = options.bindingRouter ? options.bindingRouter : function(className, bindings) {
-            var classPath = className.split(".");
-            var bindingObject = bindings;
+        this.bindingRouter = options.bindingRouter || function(className, bindings) {
+            var i, j, classPath, bindingObject;
 
-            for (var i = 0; i < classPath.length; i++) {
+            //if the class name matches a property directly, then return it
+            if (bindings[className]) {
+                return bindings[className];
+            }
+
+            //search for sub-properites that might contain the bindings
+            classPath = className.split(".");
+            bindingObject = bindings;
+
+            for (var i = 0, j = classPath.length; i < j; i++) {
                 bindingObject = bindingObject[classPath[i]];
             };
 

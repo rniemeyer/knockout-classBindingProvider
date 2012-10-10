@@ -1,4 +1,4 @@
-//knockout-classBindingProvider v0.3.2 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
+//knockout-classBindingProvider v0.4.0 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
 !(function(factory) {
     //AMD
     if (typeof define === "function" && define.amd) {
@@ -10,7 +10,7 @@
 }(function(ko, exports, undefined) {
     //a bindingProvider that uses something different than data-bind attributes
     //  bindings - an object that contains the binding classes
-    //  options - is an object that can include "attribute", "virtualAttribute", and "fallback" options
+    //  options - is an object that can include "attribute", "virtualAttribute", bindingRouter, and "fallback" options
     var classBindingsProvider = function(bindings, options) {
         var existingProvider = new ko.bindingProvider();
 
@@ -27,6 +27,26 @@
 
         //this object holds the binding classes
         this.bindings = bindings || {};
+
+        //returns a binding class, given the class name and the bindings object
+        this.bindingRouter = options.bindingRouter || function(className, bindings) {
+            var i, j, classPath, bindingObject;
+
+            //if the class name matches a property directly, then return it
+            if (bindings[className]) {
+                return bindings[className];
+            }
+
+            //search for sub-properites that might contain the bindings
+            classPath = className.split(".");
+            bindingObject = bindings;
+
+            for (var i = 0, j = classPath.length; i < j; i++) {
+                bindingObject = bindingObject[classPath[i]];
+            };
+
+            return bindingObject;
+        };
         
         //allow bindings to be registered after instantiation
         this.registerBindings = function(newBindings) {
@@ -75,7 +95,7 @@
                 classes = classes.replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, "").replace(/(\s|\u00A0){2,}/g, " ").split(' ');
                 //evaluate each class, build a single object to return
                 for (i = 0, j = classes.length; i < j; i++) {
-                    bindingAccessor = this.bindings[classes[i]];
+                    bindingAccessor = this.bindingRouter(classes[i], this.bindings);
                     if (bindingAccessor) {
                         binding = typeof bindingAccessor == "function" ? bindingAccessor.call(bindingContext.$data, bindingContext, classes) : bindingAccessor;
                         ko.utils.extend(result, binding);

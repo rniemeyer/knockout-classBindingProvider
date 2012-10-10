@@ -25,7 +25,7 @@ In your code, prior to calling `ko.applyBindings`, tell Knockout that you want t
 //options - an object that can contain these properties:
 //  attribute - override the attribute used for bindings (defaults to `data-class`)
 //  virtualAttribute - override the text used for virtual bindings (defaults to `class` and specified as `ko class:`)
-//  bindingRouter - custom function for routing data-class bindings to the appropriate binding
+//  bindingRouter - custom function for routing class names to the appropriate binding
 //  fallback - look for normal `data-bind` bindings after failing with this provider on an element (defaults to false)
 ko.bindingProvider.instance = new ko.classBindingProvider(bindings, options);
 ```
@@ -43,13 +43,13 @@ var bindings = {
     input: {
         valueUpdate: 'afterkeydown'
     },
-	list: {
-		items: function(context, classes) { 
-			return {
-				foreach: this.items
-			}
-		}
-	}
+    list: {
+        items: function(context, classes) {
+            return {
+                foreach: this.items
+            }
+        }
+    }
 };
 ```
 
@@ -81,7 +81,7 @@ Also, when using a function for a binding class, the second argument passed to t
 
 At run-time, you can also access the bindings, by using `ko.bindingProvider.instance.bindings`.  This allows you to add and remove bindings as your application needs them. You can also merge a new set of bindings into the existing bindings using `ko.bindingProvider.instance.registerBindings(newBindings);`.
 
-To use your own binding router, set `options.bindingRouter = function(class, bindings){...}`.  `class` is the current class being requested and `bindings` is the bindings object to search for the class in.  Be sure to return a valid binding object.  
+To use your own binding router, set `options.bindingRouter = function(class, bindings){...}`.  `class` is the current class being requested and `bindings` is provider's current bindings object.  Be sure to return a valid binding object.
 
 Dependencies
 ------------
