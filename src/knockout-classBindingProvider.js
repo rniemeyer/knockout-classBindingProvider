@@ -9,7 +9,7 @@
 }(function (ko, exports, undefined) {
     //a bindingProvider that uses something different than data-bind attributes
     //  bindings - an object that contains the binding classes
-    //  options - is an object that can include "attribute", "prefixAttribute", "virtualAttribute", bindingRouter, and "fallback" options
+    //  options - is an object that can include "attribute", "prefixingEnabled", "prefixAttribute", "virtualAttribute", bindingRouter, and "fallback" options
     var classBindingsProvider = function (bindings, options) {
         var existingProvider = new ko.bindingProvider();
 
@@ -17,6 +17,9 @@
 
         //override the attribute
         this.attribute = options.attribute || "data-class";
+
+        //optionally enable advanced prefixing capability
+        this.prefixingEnabled = options.prefixingEnabled || false;
 
         //override the prefix attribute
         this.prefixAttribute = options.prefixAttribute || "data-class-prefix";
@@ -71,7 +74,7 @@
             var result, value;
 
             if (node.nodeType === 1) {
-                result = node.getAttribute(this.attribute);
+                result = node.getAttribute(this.attribute) !== null;
             }
             else if (node.nodeType === 8) {
                 value = "" + node.nodeValue || node.text;
@@ -88,7 +91,11 @@
         //cache combined prefix on real nodes
         this.cachePrefix = function (node, prefix) {
             if (node.nodeType === 1) {
-                node.setAttribute(this.prefixAttribute, prefix);
+                ko.utils.domData.set(node, "class-prefix", prefix);
+                // set prefix on nodes with bindings for readability in the inspector
+                if(this.nodeHasBindings(node)) {
+                    node.setAttribute(this.prefixAttribute, prefix);
+                }
             }
         };
 
@@ -97,10 +104,19 @@
             if (!node.parentElement) {
                 // We recursed to the body tag and didn't find any prefixes.
                 // Return "$root" so that we don't have to do it again.
+                // Todo: Check instead for the node we called ko.applyBindings on
                 return "$root";
             }
 
-            var prefix = (node.nodeType === 1 && node.getAttribute(this.prefixAttribute) !== null) ? node.getAttribute(this.prefixAttribute) : null;
+            var prefix = null;
+
+            if(node.nodeType === 1) {
+                if(ko.utils.domData.get(node, "class-prefix") !== undefined) {
+                    prefix = ko.utils.domData.get(node, "class-prefix");
+                } else if(node.getAttribute(this.prefixAttribute) !== null) {
+                    prefix = node.getAttribute(this.prefixAttribute);
+                }
+            }
 
             if (prefix !== null) {
                 if (prefix === "$root" || (prefix.indexOf("$root") >= 0 && prefix !== "$root")) {
@@ -132,7 +148,7 @@
                 result = {},
                 value, index,
                 classes = "",
-                prefix = this.getCleanPrefix(node);
+                prefix = (this.prefixingEnabled) ? this.getCleanPrefix(node) : null;
 
             if (node.nodeType === 1) {
                 classes = node.getAttribute(this.attribute);

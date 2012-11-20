@@ -108,7 +108,7 @@
             bindings.count = function() { return { text: this.count } };
 
             //tell Knockout that we want to use an alternate binding provider
-            ko.bindingProvider.instance = new ko.classBindingProvider(bindings);
+            ko.bindingProvider.instance = new ko.classBindingProvider(bindings, { prefixingEnabled: true });
 
             var Item = function(name) {
                 this.name = ko.observable(name);
