@@ -64,7 +64,7 @@ Then, you would use these bindings like:
 You can also use it in a virtual binding like:
 
 ```html
-<!-- ko class: items -->
+<!-- ko class: list.items -->
 <div data-class="name"></div>
 <!-- /ko -->
 ```
