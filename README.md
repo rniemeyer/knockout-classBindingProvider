@@ -12,7 +12,7 @@ What are the benefits of this approach?
 * You can set breakpoints in the bindings to inspect the data being passed through them
 * You can do logging in the bindings to understand how many times they are being called
 * You can change/alter the bindings on an element whenever your bindings are triggered
-* Bindings go through less parsing (do not need to go from a object literal in a string to code)
+* Bindings go through less parsing (do not need to go from an object literal in a string to code)
 
 Basic Usage
 -----------
