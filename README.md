@@ -10,7 +10,7 @@ What are the benefits of this approach?
 * The markup can stay clean and simple
 * Bindings can be re-used, even at different scopes
 * You can set breakpoints in the bindings to inspect the data being passed through them
-* You can do logging in the bindings to understanding how many times they are being called
+* You can do logging in the bindings to understand how many times they are being called
 * You can change/alter the bindings on an element whenever your bindings are triggered
 * Bindings go through less parsing (do not need to go from a object literal in a string to code)
 
