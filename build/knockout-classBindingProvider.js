@@ -1,4 +1,4 @@
-//knockout-classBindingProvider v0.4.0 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
+// knockout-classBindingProvider 0.4.0 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 !(function(factory) {
     //AMD
     if (typeof define === "function" && define.amd) {

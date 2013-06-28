@@ -89,7 +89,7 @@ Dependencies
 
 Build
 -----
-This project uses anvil.js (see http://github.com/appendto/anvil.js) for building/minifying.
+This project uses [grunt](http://gruntjs.com/) for building/minifying.
 
 Examples
 --------
