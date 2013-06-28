@@ -25,7 +25,7 @@ module.exports = function(grunt) {
             }
         },
         jshint: {
-            files: 'src/knockout-postbox.js',
+            files: 'src/*.js',
             options: {
                 //"-W030": false,
                 force: true

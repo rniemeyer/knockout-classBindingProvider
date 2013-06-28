@@ -1,5 +1,5 @@
-// knockout-classBindingProvider 0.4.0 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
-!(function(factory) {
+// knockout-classBindingProvider 0.4.1 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+;(function(factory) {
     //AMD
     if (typeof define === "function" && define.amd) {
         define(["knockout", "exports"], factory);
@@ -41,16 +41,16 @@
             classPath = className.split(".");
             bindingObject = bindings;
 
-            for (var i = 0, j = classPath.length; i < j; i++) {
+            for (i = 0, j = classPath.length; i < j; i++) {
                 bindingObject = bindingObject[classPath[i]];
-            };
+            }
 
             return bindingObject;
         };
         
         //allow bindings to be registered after instantiation
         this.registerBindings = function(newBindings) {
-	        ko.utils.extend(this.bindings, newBindings);
+          ko.utils.extend(this.bindings, newBindings);
         };
 
         //determine if an element has any bindings
