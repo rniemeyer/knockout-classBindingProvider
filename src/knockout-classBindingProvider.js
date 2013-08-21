@@ -93,7 +93,7 @@
             if (node.nodeType === 1) {
                 ko.utils.domData.set(node, "class-prefix", prefix);
                 // set prefix on nodes with bindings for readability in the inspector
-                if(this.nodeHasBindings(node)) {
+                if (this.nodeHasBindings(node)) {
                     node.setAttribute(this.prefixAttribute, prefix);
                 }
             }
@@ -101,7 +101,9 @@
 
         //Finds and returns combined prefix for node
         this.getPrefix = function (node) {
-            if (!node.parentElement) {
+            var parentElement = node.parentElement || node.parentNode;
+
+            if (!parentElement) {
                 // We recursed to the body tag and didn't find any prefixes.
                 // Return "$root" so that we don't have to do it again.
                 // Todo: Check instead for the node we called ko.applyBindings on
@@ -110,10 +112,10 @@
 
             var prefix = null;
 
-            if(node.nodeType === 1) {
-                if(ko.utils.domData.get(node, "class-prefix") !== undefined) {
+            if (node.nodeType === 1) {
+                if (ko.utils.domData.get(node, "class-prefix") !== undefined) {
                     prefix = ko.utils.domData.get(node, "class-prefix");
-                } else if(node.getAttribute(this.prefixAttribute) !== null) {
+                } else if (node.getAttribute(this.prefixAttribute) !== null) {
                     prefix = node.getAttribute(this.prefixAttribute);
                 }
             }
@@ -124,13 +126,13 @@
                     return prefix;
                 } else if (prefix.indexOf("$root") === -1) {
                     // Has prefix without root defined? Search for root and return combined.
-                    prefix = this.getPrefix(node.parentElement) + "." + prefix;
+                    prefix = this.getPrefix(parentElement) + "." + prefix;
                     this.cachePrefix(node, prefix);
                     return prefix;
                 }
             } else {
                 // Doesn't have prefix? Traverse up the DOM looking for one and return it.
-                prefix = this.getPrefix(node.parentElement);
+                prefix = this.getPrefix(parentElement);
                 this.cachePrefix(node, prefix);
                 return prefix;
             }
