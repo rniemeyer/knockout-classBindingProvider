@@ -30,6 +30,19 @@ In your code, prior to calling `ko.applyBindings`, tell Knockout that you want t
 ko.bindingProvider.instance = new ko.classBindingProvider(bindings, options);
 ```
 
+If you are using an AMD loader, then the classBindingProvider is exported rather than placed on the `ko` object, so the initialization would look like:
+
+```js
+require(["knockout", "knockout-classBindingProvider"], function(ko, ClassBindingProvider) {
+   var bindings, options;
+   
+   //setup bindings and options
+   
+   ko.bindingProvider.instance = new ClassBindingProvider(bindings, options);
+});
+```
+
+
 Sample bindings object:
 
 ```js
