@@ -1,0 +1,18 @@
+{
+    "name": "knockout-classBindingProvider",
+    "version": "0.5.0",
+    "main": "build/knockout-classBindingProvider.min.js",
+    "dependencies": {
+        "knockout": ">= 2.0"
+    },
+    "ignore": [
+        "examples",
+        "ext",
+        "reports",
+        "spec",
+        "src",
+        "Gruntfile.js",
+        "package.json",
+        ".gitignore"
+    ]
+}
