@@ -7,30 +7,32 @@
         factory(ko);
     }
 }(function(ko, exports, undefined) {
-    function objectMap(source, mapping) {
-        if (!source)
+    var objectMap = function(source, mapping) {
+        var target, prop;
+
+        if (!source) {
             return source;
-        var target = {};
-        for (var prop in source) {
+        }
+
+        target = {};
+        for (prop in source) {
             if (source.hasOwnProperty(prop)) {
                 target[prop] = mapping(source[prop], prop, source);
             }
         }
         return target;
-    }
+    };
 
-    function makeValueAccessor(value) {
+    var makeValueAccessor  = function(value) {
         return function() {
             return value;
         };
-    }
-
-    var ko3 = (ko.version >= "3.0.0");
+    };
 
     // Make Knockout think that we're using observable view models by adding a "_subscribable" function to all binding contexts.
     // This makes Knockout watch any observables accessed in the getBindingAccessors function.
     // Hopefully this hack will be unnecessary in later versions.
-    if (ko.version === "3.0.0") {
+    if (ko.version >= "3.0.0") {
         (function() {
             // Create and retrieve a binding context object
             var dummyDiv = document.createElement('div');
@@ -114,7 +116,7 @@
         };
 
         //return the bindings given a node and the bindingContext
-        function getBindingsFunction(getAccessors) {
+        this.getBindingsFunction = function(getAccessors) {
             return function(node, bindingContext) {
                 var i, j, bindingAccessor, binding,
                     result = {},
@@ -152,10 +154,10 @@
 
                 return result;
             };
-        }
+        };
 
-        this.getBindings = getBindingsFunction(false);
-        this.getBindingAccessors = getBindingsFunction(true);
+        this.getBindings = this.getBindingsFunction(false);
+        this.getBindingAccessors = this.getBindingsFunction(true);
     };
 
     if (!exports) {
