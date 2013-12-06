@@ -1,6 +1,6 @@
 require.config({
     paths: {
-        "knockout": "../../ext/knockout-2.2.1",
+        "knockout": "../../ext/knockout-3.0.0",
         "classBindingProvider": "../../build/knockout-classBindingProvider.min"
     }
 });
