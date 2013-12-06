@@ -95,7 +95,7 @@ describe("knockout-classBindingProvider", function() {
         });
     });
 
-    describe("getBindings", function() {
+    describe("getBindingAccessors", function() {
         describe("when using a single class", function() {
             describe("for elements", function() {
                 var div;
@@ -110,7 +110,8 @@ describe("knockout-classBindingProvider", function() {
                         visible: true
                     };
 
-                    expect(instance.getBindings(div)).toEqual(instance.bindings.one);
+                    expect(instance.getBindingAccessors(div).text()).toEqual("test");
+                    expect(instance.getBindingAccessors(div).visible()).toEqual(true);
                 });
 
                 it("should execute the binding with the data as the value of 'this'", function() {
@@ -120,7 +121,7 @@ describe("knockout-classBindingProvider", function() {
                         valueOfThis = this;
                     };
 
-                    instance.getBindings(div, { $data: data });
+                    instance.getBindingAccessors(div, { $data: data });
 
                     expect(valueOfThis).toEqual(data);
                 });
@@ -130,7 +131,7 @@ describe("knockout-classBindingProvider", function() {
 
                     instance.bindings.one = bindingSpy;
 
-                    instance.getBindings(div, context);
+                    instance.getBindingAccessors(div, context);
 
                     expect(bindingSpy).toHaveBeenCalled();
                     expect(bindingSpy.mostRecentCall.args[0]).toEqual(context);
@@ -138,7 +139,7 @@ describe("knockout-classBindingProvider", function() {
                 });
 
                 it("should ignore a class that does not exist in the bindings for an element", function() {
-                    expect(ko.toJSON(instance.getBindings(div))).toEqual("{}");
+                    expect(ko.toJSON(instance.getBindingAccessors(div))).toEqual("{}");
                 });
 
                 it("should return the appropriate bindings when using a custom attribute", function() {
@@ -152,7 +153,8 @@ describe("knockout-classBindingProvider", function() {
                     div = document.createElement("div");
                     div.setAttribute("data-test", "one");
 
-                    expect(instance.getBindings(div)).toEqual(instance.bindings.one);
+                    expect(instance.getBindingAccessors(div).text()).toEqual("test");
+                    expect(instance.getBindingAccessors(div).visible()).toEqual(true);
                 });
             });
 
@@ -169,7 +171,8 @@ describe("knockout-classBindingProvider", function() {
                         visible: true
                     };
 
-                    expect(instance.getBindings(comment)).toEqual(instance.bindings.one);
+                    expect(instance.getBindingAccessors(comment).text()).toEqual("test");
+                    expect(instance.getBindingAccessors(comment).visible()).toEqual(true);
                 });
 
                 it("should execute the binding with the data as the value of 'this'", function() {
@@ -179,7 +182,7 @@ describe("knockout-classBindingProvider", function() {
                         valueOfThis = this;
                     };
 
-                    instance.getBindings(comment, { $data: data });
+                    instance.getBindingAccessors(comment, { $data: data });
 
                     expect(valueOfThis).toEqual(data);
                 });
@@ -189,7 +192,7 @@ describe("knockout-classBindingProvider", function() {
 
                     instance.bindings.one = bindingSpy;
 
-                    instance.getBindings(comment, context);
+                    instance.getBindingAccessors(comment, context);
 
                     expect(bindingSpy).toHaveBeenCalled();
                     expect(bindingSpy.mostRecentCall.args[0]).toEqual(context);
@@ -197,7 +200,7 @@ describe("knockout-classBindingProvider", function() {
                 });
 
                 it("should ignore a class that does not exist in the bindings for a comment", function() {
-                    expect(ko.toJSON(instance.getBindings(comment))).toEqual("{}");
+                    expect(ko.toJSON(instance.getBindingAccessors(comment))).toEqual("{}");
                 });
 
                 it("should return the appropriate bindings when using a custom virtual attribute", function() {
@@ -209,7 +212,8 @@ describe("knockout-classBindingProvider", function() {
                     instance.virtualAttribute = "ko test:";
                     comment = document.createComment("ko test: one");
 
-                    expect(instance.getBindings(comment)).toEqual(instance.bindings.one);
+                    expect(instance.getBindingAccessors(comment).text()).toEqual("test");
+                    expect(instance.getBindingAccessors(comment).visible()).toEqual(true);
                 });
             });
         });
@@ -230,7 +234,8 @@ describe("knockout-classBindingProvider", function() {
                         two: { visible: true }
                     };
 
-                    expect(ko.toJSON(instance.getBindings(div))).toEqual(ko.toJSON({ text: "test", visible: true }));
+                    expect(instance.getBindingAccessors(div).text()).toEqual("test");
+                    expect(instance.getBindingAccessors(div).visible()).toEqual(true);
                 });
 
                 it("should execute the binding with the data as the value of 'this'", function() {
@@ -247,7 +252,7 @@ describe("knockout-classBindingProvider", function() {
                         valueOfThisTwo = this;
                     };
 
-                    instance.getBindings(div, { $data: data });
+                    instance.getBindingAccessors(div, { $data: data });
 
                     expect(valueOfThisOne).toEqual(data);
                     expect(valueOfThisTwo).toEqual(data);
@@ -263,7 +268,7 @@ describe("knockout-classBindingProvider", function() {
                     instance.bindings.one = bindingSpyOne;
                     instance.bindings.two = bindingSpyTwo;
 
-                    instance.getBindings(div, context);
+                    instance.getBindingAccessors(div, context);
 
                     expect(bindingSpyOne).toHaveBeenCalled();
                     expect(bindingSpyOne.mostRecentCall.args[0]).toEqual(context);
@@ -286,7 +291,7 @@ describe("knockout-classBindingProvider", function() {
                     instance.bindings.one = bindingSpyOne;
                     instance.bindings.two = bindingSpyTwo;
 
-                    instance.getBindings(div, context);
+                    instance.getBindingAccessors(div, context);
 
                     expect(bindingSpyOne).toHaveBeenCalled();
                     expect(bindingSpyOne.mostRecentCall.args[0]).toEqual(context);
@@ -309,14 +314,15 @@ describe("knockout-classBindingProvider", function() {
                         two: { visible: true }
                     };
 
-                    expect(ko.toJSON(instance.getBindings(div))).toEqual(ko.toJSON({ text: "test" }));
+                    expect(instance.getBindingAccessors(div).text()).toEqual("test");
+                    expect(instance.getBindingAccessors(div).visible).toBeUndefined;
                 });
 
                 it("should properly ignore a case where all bindings do not exist", function() {
                     div.setAttribute("data-class", "three four");
 
                     instance.bindings = { one: { text: "test" }, two: { visible: true } };
-                    expect(ko.toJSON(instance.getBindings(div))).toEqual("{}");
+                    expect(ko.toJSON(instance.getBindingAccessors(div))).toEqual("{}");
                 });
             });
 
@@ -325,7 +331,8 @@ describe("knockout-classBindingProvider", function() {
                     var comment = document.createComment("ko class: one two");
 
                     instance.bindings = { one: { text: "test" }, two: { visible: true } };
-                    expect(ko.toJSON(instance.getBindings(comment))).toEqual(ko.toJSON({ text: "test", visible: true }));
+                    expect(instance.getBindingAccessors(comment).text()).toEqual("test");
+                    expect(instance.getBindingAccessors(comment).visible()).toEqual(true);
                 });
 
                 it("should execute the binding with the data as the value of 'this'", function() {
@@ -341,7 +348,7 @@ describe("knockout-classBindingProvider", function() {
                         valueOfThisTwo = this;
                     };
 
-                    instance.getBindings(comment, { $data: data });
+                    instance.getBindingAccessors(comment, { $data: data });
 
                     expect(valueOfThisOne).toEqual(data);
                     expect(valueOfThisTwo).toEqual(data);
@@ -356,7 +363,7 @@ describe("knockout-classBindingProvider", function() {
                     instance.bindings.one = bindingSpyOne;
                     instance.bindings.two = bindingSpyTwo;
 
-                    instance.getBindings(comment, context);
+                    instance.getBindingAccessors(comment, context);
 
                     expect(bindingSpyOne).toHaveBeenCalled();
                     expect(bindingSpyOne.mostRecentCall.args[0]).toEqual(context);
@@ -378,7 +385,7 @@ describe("knockout-classBindingProvider", function() {
                     instance.bindings.one = bindingSpyOne;
                     instance.bindings.two = bindingSpyTwo;
 
-                    instance.getBindings(comment, context);
+                    instance.getBindingAccessors(comment, context);
 
                     expect(bindingSpyOne).toHaveBeenCalled();
                     expect(bindingSpyOne.mostRecentCall.args[0]).toEqual(context);
@@ -401,14 +408,15 @@ describe("knockout-classBindingProvider", function() {
                         two: { visible: true }
                     };
 
-                    expect(ko.toJSON(instance.getBindings(comment))).toEqual(ko.toJSON({ text: "test" }));
+                    expect(instance.getBindingAccessors(comment).text()).toEqual("test");
+                    expect(instance.getBindingAccessors(comment).visible).toBeUndefined();
                 });
 
                 it("should properly ignore a case where all bindings do not exist", function() {
                     var comment = document.createComment("ko class: three four");
 
                     instance.bindings = { one: { text: "test" }, two: { visible: true } };
-                    expect(ko.toJSON(instance.getBindings(comment))).toEqual("{}");
+                    expect(ko.toJSON(instance.getBindingAccessors(comment))).toEqual("{}");
                 });
             });
         });
